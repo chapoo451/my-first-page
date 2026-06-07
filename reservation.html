@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>予約フォーム</title>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background-color: #fff;
+      color: #333;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 2.5rem;
+    }
+
+    h1 {
+      margin: 0 0 1.5rem;
+      font-size: 1.375rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    h2 {
+      margin: 2rem 0 1rem;
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
+
+    .field {
+      margin-bottom: 1.125rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.375rem;
+      font-size: 0.9375rem;
+      font-weight: 500;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.75rem 0.875rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #fff;
+      color: #333;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    input:invalid:not(:placeholder-shown) {
+      border-color: #dc2626;
+    }
+
+    .submit-btn {
+      width: 100%;
+      margin-top: 0.5rem;
+      padding: 0.875rem 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background-color: #2563eb;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.15s;
+    }
+
+    .submit-btn:hover:not(:disabled) {
+      background-color: #1d4ed8;
+    }
+
+    .submit-btn:disabled {
+      background-color: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .message {
+      display: none;
+      margin-top: 1.5rem;
+      padding: 1rem 1.125rem;
+      font-size: 1rem;
+      text-align: center;
+      background-color: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      color: #166534;
+    }
+
+    .message.is-visible {
+      display: block;
+    }
+
+    .message.is-error {
+      background-color: #fef2f2;
+      border-color: #fecaca;
+      color: #991b1b;
+    }
+
+    .reservation-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .reservation-item {
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background-color: #fafafa;
+    }
+
+    .reservation-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .reservation-item dl {
+      margin: 0 0 0.875rem;
+    }
+
+    .reservation-item dt {
+      display: inline;
+      font-size: 0.8125rem;
+      color: #64748b;
+    }
+
+    .reservation-item dt::after {
+      content: "：";
+    }
+
+    .reservation-item dd {
+      display: inline;
+      margin: 0;
+      font-size: 0.9375rem;
+    }
+
+    .reservation-item .row {
+      margin-bottom: 0.375rem;
+    }
+
+    .reservation-item .row:last-child {
+      margin-bottom: 0;
+    }
+
+    .delete-btn {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #dc2626;
+      background-color: #fff;
+      border: 1px solid #fca5a5;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.15s;
+    }
+
+    .delete-btn:hover {
+      background-color: #fef2f2;
+    }
+
+    .empty-list {
+      margin: 0;
+      padding: 1rem;
+      font-size: 0.9375rem;
+      text-align: center;
+      color: #64748b;
+      border: 1px dashed #d1d5db;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>予約フォーム</h1>
+
+    <form id="reservationForm" novalidate>
+      <div class="field">
+        <label for="name">お名前</label>
+        <input type="text" id="name" name="name" required autocomplete="name" placeholder="山田 太郎">
+      </div>
+
+      <div class="field">
+        <label for="date">予約日</label>
+        <input type="date" id="date" name="date" required>
+      </div>
+
+      <div class="field">
+        <label for="time">予約時間</label>
+        <input type="time" id="time" name="time" required>
+      </div>
+
+      <div class="field">
+        <label for="guests">人数</label>
+        <input type="number" id="guests" name="guests" required min="1" max="20" step="1" inputmode="numeric" placeholder="1〜20">
+      </div>
+
+      <div class="field">
+        <label for="phone">連絡先（電話番号）</label>
+        <input type="tel" id="phone" name="phone" required autocomplete="tel" placeholder="090-1234-5678">
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn" disabled>予約を確定する</button>
+    </form>
+
+    <p class="message" id="confirmationMessage" role="status" aria-live="polite"></p>
+
+    <section id="reservationListSection">
+      <h2>予約一覧</h2>
+      <ul class="reservation-list" id="reservationList"></ul>
+    </section>
+  </div>
+
+  <script>
+    const API_URL = "/api/reservations";
+    const form = document.getElementById("reservationForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const confirmationMessage = document.getElementById("confirmationMessage");
+    const reservationList = document.getElementById("reservationList");
+    const inputs = form.querySelectorAll("input");
+
+    function isFormValid() {
+      return form.checkValidity();
+    }
+
+    function updateSubmitButton() {
+      submitBtn.disabled = !isFormValid();
+    }
+
+    inputs.forEach((input) => {
+      input.addEventListener("input", updateSubmitButton);
+      input.addEventListener("change", updateSubmitButton);
+    });
+
+    function formatTime(timeValue) {
+      const [hour, minute] = timeValue.split(":").map(Number);
+      if (minute === 0) {
+        return `${hour}時`;
+      }
+      return `${hour}時${minute}分`;
+    }
+
+    function formatDate(dateValue) {
+      const [, month, day] = dateValue.split("-").map(Number);
+      return `${month}月${day}日`;
+    }
+
+    function formatCreatedAtJst(createdAt) {
+      if (!createdAt) return "—";
+
+      const jst = new Date(createdAt + 9 * 60 * 60 * 1000);
+      const year = jst.getUTCFullYear();
+      const month = jst.getUTCMonth() + 1;
+      const day = jst.getUTCDate();
+      const hour = jst.getUTCHours();
+      const minute = String(jst.getUTCMinutes()).padStart(2, "0");
+
+      return `${year}年${month}月${day}日 ${hour}:${minute}`;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function showMessage(text, isError = false) {
+      confirmationMessage.textContent = text;
+      confirmationMessage.classList.toggle("is-error", isError);
+      confirmationMessage.classList.add("is-visible");
+    }
+
+    function renderReservationList(reservations) {
+      if (reservations.length === 0) {
+        reservationList.innerHTML = '<li><p class="empty-list">予約はまだありません</p></li>';
+        return;
+      }
+
+      reservationList.innerHTML = reservations.map((reservation) => `
+        <li class="reservation-item" data-id="${reservation.id}">
+          <dl>
+            <div class="row"><dt>名前</dt><dd>${escapeHtml(reservation.name)}</dd></div>
+            <div class="row"><dt>日付</dt><dd>${escapeHtml(formatDate(reservation.date))}</dd></div>
+            <div class="row"><dt>時間</dt><dd>${escapeHtml(formatTime(reservation.time))}</dd></div>
+            <div class="row"><dt>受付日時</dt><dd>${escapeHtml(formatCreatedAtJst(reservation.createdAt))}</dd></div>
+            <div class="row"><dt>人数</dt><dd>${escapeHtml(String(reservation.guests))}名</dd></div>
+            <div class="row"><dt>連絡先</dt><dd>${escapeHtml(reservation.phone)}</dd></div>
+          </dl>
+          <button type="button" class="delete-btn" data-id="${escapeHtml(reservation.id)}">削除</button>
+        </li>
+      `).join("");
+    }
+
+    async function fetchReservations() {
+      const response = await fetch(API_URL);
+
+      if (!response.ok) {
+        throw new Error("一覧の取得に失敗しました");
+      }
+
+      return response.json();
+    }
+
+    async function loadReservationList() {
+      try {
+        const reservations = await fetchReservations();
+        renderReservationList(reservations);
+      } catch {
+        reservationList.innerHTML =
+          '<li><p class="empty-list">予約一覧を読み込めませんでした</p></li>';
+      }
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      if (!isFormValid()) {
+        form.reportValidity();
+        return;
+      }
+
+      const name = form.name.value.trim();
+      const dateValue = form.date.value;
+      const timeValue = form.time.value;
+      const guests = Number(form.guests.value);
+      const phone = form.phone.value.trim();
+
+      submitBtn.disabled = true;
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name,
+            date: dateValue,
+            time: timeValue,
+            guests,
+            phone,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("送信に失敗しました");
+        }
+
+        const [, month, day] = dateValue.split("-").map(Number);
+        const timeText = formatTime(timeValue);
+
+        showMessage(`${name}様${guests}名、${month}月${day}日${timeText}の予約を受け付けました`);
+
+        const reservations = await fetchReservations();
+        renderReservationList(reservations);
+      } catch {
+        showMessage("予約の送信に失敗しました。サーバーが起動しているか確認してください。", true);
+      } finally {
+        updateSubmitButton();
+      }
+    });
+
+    async function deleteReservation(id) {
+      const response = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+
+      if (!response.ok) {
+        throw new Error("削除に失敗しました");
+      }
+    }
+
+    reservationList.addEventListener("click", async (event) => {
+      const deleteBtn = event.target.closest(".delete-btn");
+      if (!deleteBtn) return;
+
+      const id = deleteBtn.dataset.id;
+
+      try {
+        await deleteReservation(id);
+        const reservations = await fetchReservations();
+        renderReservationList(reservations);
+      } catch {
+        showMessage("予約の削除に失敗しました。", true);
+      }
+    });
+
+    loadReservationList();
+  </script>
+</body>
+</html>

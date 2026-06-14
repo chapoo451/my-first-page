@@ -1,4 +1,6 @@
-require("dotenv").config();
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 
 const express = require("express");
 const path = require("path");
@@ -11,7 +13,7 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error("SUPABASE_URL と SUPABASE_ANON_KEY を .env に設定してください");
+  console.error("SUPABASE_URL と SUPABASE_ANON_KEY を環境変数に設定してください");
   process.exit(1);
 }
 

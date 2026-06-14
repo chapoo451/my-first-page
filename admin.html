@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>予約管理</title>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background-color: #fff;
+      color: #333;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 2.5rem;
+    }
+
+    h1 {
+      margin: 0 0 1.5rem;
+      font-size: 1.375rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .field {
+      margin-bottom: 1.125rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.375rem;
+      font-size: 0.9375rem;
+      font-weight: 500;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.75rem 0.875rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #fff;
+      color: #333;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .login-box {
+      max-width: 360px;
+      margin: 0 auto;
+    }
+
+    .btn {
+      padding: 0.75rem 1rem;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.15s;
+    }
+
+    .btn-primary {
+      width: 100%;
+      color: #fff;
+      background-color: #2563eb;
+    }
+
+    .btn-primary:hover {
+      background-color: #1d4ed8;
+    }
+
+    .btn-danger {
+      color: #dc2626;
+      background-color: #fff;
+      border: 1px solid #fca5a5;
+    }
+
+    .btn-danger:hover {
+      background-color: #fef2f2;
+    }
+
+    .message {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.875rem 1rem;
+      font-size: 0.9375rem;
+      text-align: center;
+      border-radius: 8px;
+    }
+
+    .message.is-visible {
+      display: block;
+    }
+
+    .message.is-error {
+      background-color: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+    }
+
+    .admin-panel {
+      display: none;
+    }
+
+    .admin-panel.is-visible {
+      display: block;
+    }
+
+    .login-screen.is-hidden {
+      display: none;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9375rem;
+      background-color: #fff;
+    }
+
+    thead {
+      background-color: #f8fafc;
+    }
+
+    th,
+    td {
+      padding: 0.75rem 0.875rem;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+      white-space: nowrap;
+    }
+
+    th {
+      font-weight: 600;
+      color: #475569;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background-color: #fafafa;
+    }
+
+    .empty-cell {
+      padding: 2rem 1rem;
+      text-align: center;
+      color: #64748b;
+    }
+
+    .count {
+      margin-bottom: 1rem;
+      font-size: 0.9375rem;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="login-screen" id="loginScreen">
+      <div class="login-box">
+        <h1>予約管理</h1>
+        <form id="loginForm">
+          <div class="field">
+            <label for="password">パスワード</label>
+            <input type="password" id="password" name="password" required autocomplete="current-password">
+          </div>
+          <button type="submit" class="btn btn-primary">ログイン</button>
+        </form>
+        <p class="message is-error" id="loginError"></p>
+      </div>
+    </section>
+
+    <section class="admin-panel" id="adminPanel">
+      <h1>予約管理</h1>
+      <p class="count" id="reservationCount"></p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>名前</th>
+              <th>予約日</th>
+              <th>時間</th>
+              <th>人数</th>
+              <th>連絡先</th>
+              <th>受付日時</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="reservationTableBody"></tbody>
+        </table>
+      </div>
+      <p class="message is-error" id="adminError"></p>
+    </section>
+  </div>
+
+  <script>
+    const ADMIN_PASSWORD = "admin1234";
+    const API_URL = "/api/reservations";
+
+    const loginScreen = document.getElementById("loginScreen");
+    const loginForm = document.getElementById("loginForm");
+    const loginError = document.getElementById("loginError");
+    const adminPanel = document.getElementById("adminPanel");
+    const adminError = document.getElementById("adminError");
+    const reservationTableBody = document.getElementById("reservationTableBody");
+    const reservationCount = document.getElementById("reservationCount");
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function formatReservationDate(dateValue) {
+      const [year, month, day] = dateValue.split("-").map(Number);
+      return `${year}年${month}月${day}日`;
+    }
+
+    function formatTime(timeValue) {
+      const [hour, minute] = timeValue.split(":").map(Number);
+      return `${hour}:${String(minute).padStart(2, "0")}`;
+    }
+
+    function formatCreatedAtJst(createdAt) {
+      if (!createdAt) return "—";
+
+      const jst = new Date(createdAt + 9 * 60 * 60 * 1000);
+      const year = jst.getUTCFullYear();
+      const month = jst.getUTCMonth() + 1;
+      const day = jst.getUTCDate();
+      const hour = jst.getUTCHours();
+      const minute = String(jst.getUTCMinutes()).padStart(2, "0");
+
+      return `${year}年${month}月${day}日 ${hour}:${minute}`;
+    }
+
+    function sortByDate(reservations) {
+      return [...reservations].sort((a, b) => {
+        if (a.date !== b.date) {
+          return a.date.localeCompare(b.date);
+        }
+        return a.time.localeCompare(b.time);
+      });
+    }
+
+    function showLoginError(message) {
+      loginError.textContent = message;
+      loginError.classList.add("is-visible");
+    }
+
+    function showAdminError(message) {
+      adminError.textContent = message;
+      adminError.classList.add("is-visible");
+    }
+
+    function hideAdminError() {
+      adminError.textContent = "";
+      adminError.classList.remove("is-visible");
+    }
+
+    function renderTable(reservations) {
+      reservationCount.textContent = `全 ${reservations.length} 件`;
+
+      if (reservations.length === 0) {
+        reservationTableBody.innerHTML =
+          '<tr><td class="empty-cell" colspan="7">予約はまだありません</td></tr>';
+        return;
+      }
+
+      reservationTableBody.innerHTML = sortByDate(reservations).map((reservation) => `
+        <tr>
+          <td>${escapeHtml(reservation.name)}</td>
+          <td>${escapeHtml(formatReservationDate(reservation.date))}</td>
+          <td>${escapeHtml(formatTime(reservation.time))}</td>
+          <td>${escapeHtml(String(reservation.guests))}名</td>
+          <td>${escapeHtml(reservation.phone)}</td>
+          <td>${escapeHtml(formatCreatedAtJst(reservation.createdAt))}</td>
+          <td>
+            <button type="button" class="btn btn-danger delete-btn" data-id="${escapeHtml(reservation.id)}">削除</button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    async function fetchReservations() {
+      const response = await fetch(API_URL);
+
+      if (!response.ok) {
+        throw new Error("一覧の取得に失敗しました");
+      }
+
+      return response.json();
+    }
+
+    async function loadReservations() {
+      hideAdminError();
+
+      try {
+        const reservations = await fetchReservations();
+        renderTable(reservations);
+      } catch {
+        reservationTableBody.innerHTML =
+          '<tr><td class="empty-cell" colspan="7">予約一覧を読み込めませんでした</td></tr>';
+        reservationCount.textContent = "";
+        showAdminError("予約一覧の取得に失敗しました。");
+      }
+    }
+
+    async function deleteReservation(id) {
+      const response = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+
+      if (!response.ok) {
+        throw new Error("削除に失敗しました");
+      }
+    }
+
+    loginForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const password = loginForm.password.value;
+
+      if (password !== ADMIN_PASSWORD) {
+        showLoginError("パスワードが正しくありません");
+        return;
+      }
+
+      loginError.classList.remove("is-visible");
+      loginScreen.classList.add("is-hidden");
+      adminPanel.classList.add("is-visible");
+      loadReservations();
+    });
+
+    reservationTableBody.addEventListener("click", async (event) => {
+      const deleteBtn = event.target.closest(".delete-btn");
+      if (!deleteBtn) return;
+
+      if (!confirm("この予約を削除しますか？")) return;
+
+      try {
+        await deleteReservation(deleteBtn.dataset.id);
+        await loadReservations();
+      } catch {
+        showAdminError("予約の削除に失敗しました。");
+      }
+    });
+  </script>
+</body>
+</html>

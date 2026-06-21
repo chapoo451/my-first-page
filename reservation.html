@@ -22,7 +22,7 @@
     }
 
     .container {
-      max-width: 420px;
+      max-width: 480px;
       margin: 0 auto;
       padding: 1.5rem 1.25rem 2.5rem;
     }
@@ -35,9 +35,183 @@
     }
 
     h2 {
-      margin: 2rem 0 1rem;
-      font-size: 1.125rem;
+      margin: 0 0 1rem;
+      font-size: 1.0625rem;
       font-weight: 600;
+    }
+
+    .section {
+      margin-bottom: 2rem;
+    }
+
+    .section.is-hidden {
+      display: none;
+    }
+
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .calendar-title {
+      font-size: 1.0625rem;
+      font-weight: 600;
+    }
+
+    .nav-btn {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.9375rem;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .nav-btn:hover {
+      background: #f8fafc;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.375rem;
+    }
+
+    .calendar-weekday {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #64748b;
+      text-align: center;
+      padding: 0.25rem 0;
+    }
+
+    .calendar-weekday.is-sunday {
+      color: #dc2626;
+    }
+
+    .calendar-weekday.is-saturday {
+      color: #2563eb;
+    }
+
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9375rem;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: none;
+      cursor: pointer;
+      color: #333;
+    }
+
+    .calendar-day:hover:not(:disabled) {
+      background: #f1f5f9;
+    }
+
+    .calendar-day.is-empty {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .calendar-day.is-past {
+      color: #cbd5e1;
+      cursor: not-allowed;
+    }
+
+    .calendar-day.is-today {
+      border-color: #2563eb;
+      font-weight: 600;
+    }
+
+    .calendar-day.is-selected {
+      background: #2563eb;
+      color: #fff;
+      border-color: #2563eb;
+    }
+
+    .calendar-day.is-sunday:not(.is-selected) {
+      color: #dc2626;
+    }
+
+    .calendar-day.is-saturday:not(.is-selected) {
+      color: #2563eb;
+    }
+
+    .slot-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+    }
+
+    .slot-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0.875rem 1rem;
+      font-size: 0.9375rem;
+      text-align: left;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: #fff;
+      cursor: pointer;
+      transition: background-color 0.15s, opacity 0.15s;
+    }
+
+    .slot-btn:hover:not(:disabled) {
+      filter: brightness(0.98);
+    }
+
+    .slot-btn.is-available {
+      border-color: #86efac;
+      background: #f0fdf4;
+    }
+
+    .slot-btn.is-few {
+      border-color: #fcd34d;
+      background: #fffbeb;
+    }
+
+    .slot-btn.is-full {
+      border-color: #e5e7eb;
+      background: #f1f5f9;
+      color: #94a3b8;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .slot-time {
+      font-weight: 600;
+    }
+
+    .slot-status {
+      font-size: 0.8125rem;
+      font-weight: 500;
+    }
+
+    .slot-btn.is-available .slot-status {
+      color: #166534;
+    }
+
+    .slot-btn.is-few .slot-status {
+      color: #b45309;
+    }
+
+    .slot-btn.is-full .slot-status {
+      color: #94a3b8;
+    }
+
+    .selected-info {
+      margin-bottom: 1.25rem;
+      padding: 0.875rem 1rem;
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 0.9375rem;
     }
 
     .field {
@@ -69,22 +243,21 @@
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
     }
 
-    input:invalid:not(:placeholder-shown) {
-      border-color: #dc2626;
-    }
-
-    .submit-btn {
+    .submit-btn,
+    .back-btn {
       width: 100%;
-      margin-top: 0.5rem;
       padding: 0.875rem 1rem;
       font-size: 1rem;
       font-weight: 600;
-      color: #fff;
-      background-color: #2563eb;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.15s;
+    }
+
+    .submit-btn {
+      margin-top: 0.5rem;
+      color: #fff;
+      background-color: #2563eb;
     }
 
     .submit-btn:hover:not(:disabled) {
@@ -96,11 +269,22 @@
       cursor: not-allowed;
     }
 
+    .back-btn {
+      margin-bottom: 0.75rem;
+      color: #475569;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+    }
+
+    .back-btn:hover {
+      background: #f8fafc;
+    }
+
     .message {
       display: none;
-      margin-top: 1.5rem;
+      margin-top: 1rem;
       padding: 1rem 1.125rem;
-      font-size: 1rem;
+      font-size: 0.9375rem;
       text-align: center;
       background-color: #f0fdf4;
       border: 1px solid #bbf7d0;
@@ -118,74 +302,11 @@
       color: #991b1b;
     }
 
-    .reservation-list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .reservation-item {
+    .empty-slots,
+    .loading {
       padding: 1rem;
-      margin-bottom: 0.75rem;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      background-color: #fafafa;
-    }
-
-    .reservation-item:last-child {
-      margin-bottom: 0;
-    }
-
-    .reservation-item dl {
-      margin: 0 0 0.875rem;
-    }
-
-    .reservation-item dt {
-      display: inline;
-      font-size: 0.8125rem;
-      color: #64748b;
-    }
-
-    .reservation-item dt::after {
-      content: "：";
-    }
-
-    .reservation-item dd {
-      display: inline;
-      margin: 0;
-      font-size: 0.9375rem;
-    }
-
-    .reservation-item .row {
-      margin-bottom: 0.375rem;
-    }
-
-    .reservation-item .row:last-child {
-      margin-bottom: 0;
-    }
-
-    .delete-btn {
-      width: 100%;
-      padding: 0.5rem 0.75rem;
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: #dc2626;
-      background-color: #fff;
-      border: 1px solid #fca5a5;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.15s;
-    }
-
-    .delete-btn:hover {
-      background-color: #fef2f2;
-    }
-
-    .empty-list {
-      margin: 0;
-      padding: 1rem;
-      font-size: 0.9375rem;
       text-align: center;
+      font-size: 0.9375rem;
       color: #64748b;
       border: 1px dashed #d1d5db;
       border-radius: 8px;
@@ -196,50 +317,109 @@
   <div class="container">
     <h1>予約フォーム</h1>
 
-    <form id="reservationForm" novalidate>
-      <div class="field">
-        <label for="name">お名前</label>
-        <input type="text" id="name" name="name" required autocomplete="name" placeholder="山田 太郎">
+    <section class="section" id="calendarSection">
+      <div class="calendar-header">
+        <button type="button" class="nav-btn" id="prevMonthBtn" aria-label="前の月">‹</button>
+        <div class="calendar-title" id="calendarTitle"></div>
+        <button type="button" class="nav-btn" id="nextMonthBtn" aria-label="次の月">›</button>
       </div>
+      <div class="calendar-grid" id="calendarWeekdays"></div>
+      <div class="calendar-grid" id="calendarDays"></div>
+    </section>
 
-      <div class="field">
-        <label for="date">予約日</label>
-        <input type="date" id="date" name="date" required>
-      </div>
+    <section class="section is-hidden" id="slotsSection">
+      <h2 id="slotsTitle"></h2>
+      <div id="slotsContainer"></div>
+    </section>
 
-      <div class="field">
-        <label for="time">予約時間</label>
-        <input type="time" id="time" name="time" required>
-      </div>
-
-      <div class="field">
-        <label for="guests">人数</label>
-        <input type="number" id="guests" name="guests" required min="1" max="20" step="1" inputmode="numeric" placeholder="1〜20">
-      </div>
-
-      <div class="field">
-        <label for="phone">連絡先（電話番号）</label>
-        <input type="tel" id="phone" name="phone" required autocomplete="tel" placeholder="090-1234-5678">
-      </div>
-
-      <button type="submit" class="submit-btn" id="submitBtn" disabled>予約を確定する</button>
-    </form>
+    <section class="section is-hidden" id="formSection">
+      <button type="button" class="back-btn" id="backToSlotsBtn">時間帯を選び直す</button>
+      <div class="selected-info" id="selectedInfo"></div>
+      <form id="reservationForm" novalidate>
+        <div class="field">
+          <label for="name">お名前</label>
+          <input type="text" id="name" name="name" required autocomplete="name" placeholder="山田 太郎">
+        </div>
+        <div class="field">
+          <label for="guests">人数</label>
+          <input type="number" id="guests" name="guests" required min="1" max="20" step="1" inputmode="numeric" placeholder="1〜20">
+        </div>
+        <div class="field">
+          <label for="phone">連絡先（電話番号）</label>
+          <input type="tel" id="phone" name="phone" required autocomplete="tel" placeholder="090-1234-5678">
+        </div>
+        <button type="submit" class="submit-btn" id="submitBtn" disabled>予約を確定する</button>
+      </form>
+    </section>
 
     <p class="message" id="confirmationMessage" role="status" aria-live="polite"></p>
-
-    <section id="reservationListSection">
-      <h2>予約一覧</h2>
-      <ul class="reservation-list" id="reservationList"></ul>
-    </section>
   </div>
 
   <script>
-    const API_URL = "/api/reservations";
+    const RESERVATIONS_API = "/api/reservations";
+    const TIMESLOTS_API = "/api/timeslots";
+    const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
+    const STATUS_LABELS = {
+      available: "空き",
+      few: "残りわずか",
+      full: "満席",
+    };
+
+    const calendarTitle = document.getElementById("calendarTitle");
+    const calendarWeekdays = document.getElementById("calendarWeekdays");
+    const calendarDays = document.getElementById("calendarDays");
+    const prevMonthBtn = document.getElementById("prevMonthBtn");
+    const nextMonthBtn = document.getElementById("nextMonthBtn");
+    const slotsSection = document.getElementById("slotsSection");
+    const slotsTitle = document.getElementById("slotsTitle");
+    const slotsContainer = document.getElementById("slotsContainer");
+    const formSection = document.getElementById("formSection");
+    const backToSlotsBtn = document.getElementById("backToSlotsBtn");
+    const selectedInfo = document.getElementById("selectedInfo");
     const form = document.getElementById("reservationForm");
     const submitBtn = document.getElementById("submitBtn");
     const confirmationMessage = document.getElementById("confirmationMessage");
-    const reservationList = document.getElementById("reservationList");
     const inputs = form.querySelectorAll("input");
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let viewYear = today.getFullYear();
+    let viewMonth = today.getMonth();
+    let selectedDate = null;
+    let selectedTime = null;
+
+    function pad(value) {
+      return String(value).padStart(2, "0");
+    }
+
+    function toDateString(year, month, day) {
+      return `${year}-${pad(month + 1)}-${pad(day)}`;
+    }
+
+    function formatDisplayDate(dateString) {
+      const [year, month, day] = dateString.split("-").map(Number);
+      return `${year}年${month}月${day}日`;
+    }
+
+    function formatTime(timeValue) {
+      const [hour, minute] = timeValue.split(":").map(Number);
+      if (minute === 0) {
+        return `${hour}時`;
+      }
+      return `${hour}時${minute}分`;
+    }
+
+    function showMessage(text, isError = false) {
+      confirmationMessage.textContent = text;
+      confirmationMessage.classList.toggle("is-error", isError);
+      confirmationMessage.classList.add("is-visible");
+    }
+
+    function hideMessage() {
+      confirmationMessage.classList.remove("is-visible", "is-error");
+      confirmationMessage.textContent = "";
+    }
 
     function isFormValid() {
       return form.checkValidity();
@@ -254,87 +434,168 @@
       input.addEventListener("change", updateSubmitButton);
     });
 
-    function formatTime(timeValue) {
-      const [hour, minute] = timeValue.split(":").map(Number);
-      if (minute === 0) {
-        return `${hour}時`;
-      }
-      return `${hour}時${minute}分`;
+    function renderWeekdays() {
+      calendarWeekdays.innerHTML = WEEKDAYS.map((label, index) => {
+        let className = "calendar-weekday";
+        if (index === 0) className += " is-sunday";
+        if (index === 6) className += " is-saturday";
+        return `<div class="${className}">${label}</div>`;
+      }).join("");
     }
 
-    function formatDate(dateValue) {
-      const [, month, day] = dateValue.split("-").map(Number);
-      return `${month}月${day}日`;
-    }
+    function renderCalendar() {
+      calendarTitle.textContent = `${viewYear}年${viewMonth + 1}月`;
 
-    function formatCreatedAtJst(createdAt) {
-      if (!createdAt) return "—";
+      const firstDay = new Date(viewYear, viewMonth, 1);
+      const lastDay = new Date(viewYear, viewMonth + 1, 0);
+      const startWeekday = firstDay.getDay();
+      const daysInMonth = lastDay.getDate();
 
-      const jst = new Date(createdAt + 9 * 60 * 60 * 1000);
-      const year = jst.getUTCFullYear();
-      const month = jst.getUTCMonth() + 1;
-      const day = jst.getUTCDate();
-      const hour = jst.getUTCHours();
-      const minute = String(jst.getUTCMinutes()).padStart(2, "0");
+      const cells = [];
 
-      return `${year}年${month}月${day}日 ${hour}:${minute}`;
-    }
-
-    function escapeHtml(text) {
-      const div = document.createElement("div");
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    function showMessage(text, isError = false) {
-      confirmationMessage.textContent = text;
-      confirmationMessage.classList.toggle("is-error", isError);
-      confirmationMessage.classList.add("is-visible");
-    }
-
-    function renderReservationList(reservations) {
-      if (reservations.length === 0) {
-        reservationList.innerHTML = '<li><p class="empty-list">予約はまだありません</p></li>';
-        return;
+      for (let i = 0; i < startWeekday; i += 1) {
+        cells.push('<button type="button" class="calendar-day is-empty" disabled></button>');
       }
 
-      reservationList.innerHTML = reservations.map((reservation) => `
-        <li class="reservation-item" data-id="${reservation.id}">
-          <dl>
-            <div class="row"><dt>名前</dt><dd>${escapeHtml(reservation.name)}</dd></div>
-            <div class="row"><dt>日付</dt><dd>${escapeHtml(formatDate(reservation.date))}</dd></div>
-            <div class="row"><dt>時間</dt><dd>${escapeHtml(formatTime(reservation.time))}</dd></div>
-            <div class="row"><dt>受付日時</dt><dd>${escapeHtml(formatCreatedAtJst(reservation.createdAt))}</dd></div>
-            <div class="row"><dt>人数</dt><dd>${escapeHtml(String(reservation.guests))}名</dd></div>
-            <div class="row"><dt>連絡先</dt><dd>${escapeHtml(reservation.phone)}</dd></div>
-          </dl>
-          <button type="button" class="delete-btn" data-id="${escapeHtml(reservation.id)}">削除</button>
-        </li>
-      `).join("");
+      for (let day = 1; day <= daysInMonth; day += 1) {
+        const dateString = toDateString(viewYear, viewMonth, day);
+        const cellDate = new Date(viewYear, viewMonth, day);
+        const weekday = cellDate.getDay();
+        const isPast = cellDate < today;
+        const isToday = cellDate.getTime() === today.getTime();
+        const isSelected = dateString === selectedDate;
+
+        let className = "calendar-day";
+        if (isPast) className += " is-past";
+        if (isToday) className += " is-today";
+        if (isSelected) className += " is-selected";
+        if (weekday === 0) className += " is-sunday";
+        if (weekday === 6) className += " is-saturday";
+
+        cells.push(
+          `<button type="button" class="${className}" data-date="${dateString}" ${isPast ? "disabled" : ""}>${day}</button>`
+        );
+      }
+
+      calendarDays.innerHTML = cells.join("");
     }
 
-    async function fetchReservations() {
-      const response = await fetch(API_URL);
+    async function fetchTimeSlots(date) {
+      const response = await fetch(`${TIMESLOTS_API}?date=${encodeURIComponent(date)}`);
 
       if (!response.ok) {
-        throw new Error("一覧の取得に失敗しました");
+        throw new Error("時間帯の取得に失敗しました");
       }
 
       return response.json();
     }
 
-    async function loadReservationList() {
+    function renderTimeSlots(slots) {
+      if (slots.length === 0) {
+        slotsContainer.innerHTML = '<p class="empty-slots">予約可能な時間帯がありません</p>';
+        return;
+      }
+
+      slotsContainer.innerHTML = `
+        <div class="slot-list">
+          ${slots.map((slot) => {
+            const isFull = slot.status === "full";
+            return `
+              <button
+                type="button"
+                class="slot-btn is-${slot.status}"
+                data-time="${slot.time}"
+                data-status="${slot.status}"
+                ${isFull ? "disabled" : ""}
+              >
+                <span class="slot-time">${formatTime(slot.time)}</span>
+                <span class="slot-status">${STATUS_LABELS[slot.status]}（${slot.remaining}/${slot.capacity}）</span>
+              </button>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    async function loadTimeSlots(date) {
+      slotsTitle.textContent = `${formatDisplayDate(date)}の空き状況`;
+      slotsContainer.innerHTML = '<p class="loading">読み込み中...</p>';
+      slotsSection.classList.remove("is-hidden");
+      formSection.classList.add("is-hidden");
+
       try {
-        const reservations = await fetchReservations();
-        renderReservationList(reservations);
+        const slots = await fetchTimeSlots(date);
+        renderTimeSlots(slots);
       } catch {
-        reservationList.innerHTML =
-          '<li><p class="empty-list">予約一覧を読み込めませんでした</p></li>';
+        slotsContainer.innerHTML = '<p class="empty-slots">空き状況を読み込めませんでした</p>';
       }
     }
 
+    function selectDate(date) {
+      selectedDate = date;
+      selectedTime = null;
+      hideMessage();
+      renderCalendar();
+      loadTimeSlots(date);
+    }
+
+    function showBookingForm(time) {
+      selectedTime = time;
+      selectedInfo.textContent = `${formatDisplayDate(selectedDate)} ${formatTime(time)}`;
+      form.reset();
+      updateSubmitButton();
+      formSection.classList.remove("is-hidden");
+      formSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function hideBookingForm() {
+      selectedTime = null;
+      formSection.classList.add("is-hidden");
+      form.reset();
+      updateSubmitButton();
+    }
+
+    prevMonthBtn.addEventListener("click", () => {
+      viewMonth -= 1;
+      if (viewMonth < 0) {
+        viewMonth = 11;
+        viewYear -= 1;
+      }
+      renderCalendar();
+    });
+
+    nextMonthBtn.addEventListener("click", () => {
+      viewMonth += 1;
+      if (viewMonth > 11) {
+        viewMonth = 0;
+        viewYear += 1;
+      }
+      renderCalendar();
+    });
+
+    calendarDays.addEventListener("click", (event) => {
+      const dayBtn = event.target.closest(".calendar-day[data-date]");
+      if (!dayBtn || dayBtn.disabled) return;
+      selectDate(dayBtn.dataset.date);
+    });
+
+    slotsContainer.addEventListener("click", (event) => {
+      const slotBtn = event.target.closest(".slot-btn");
+      if (!slotBtn || slotBtn.disabled || slotBtn.dataset.status === "full") return;
+      showBookingForm(slotBtn.dataset.time);
+    });
+
+    backToSlotsBtn.addEventListener("click", () => {
+      hideBookingForm();
+    });
+
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
+
+      if (!selectedDate || !selectedTime) {
+        showMessage("日付と時間帯を選び直してください。", true);
+        return;
+      }
 
       if (!isFormValid()) {
         form.reportValidity();
@@ -342,37 +603,45 @@
       }
 
       const name = form.name.value.trim();
-      const dateValue = form.date.value;
-      const timeValue = form.time.value;
       const guests = Number(form.guests.value);
       const phone = form.phone.value.trim();
 
       submitBtn.disabled = true;
 
       try {
-        const response = await fetch(API_URL, {
+        const response = await fetch(RESERVATIONS_API, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             name,
-            date: dateValue,
-            time: timeValue,
+            date: selectedDate,
+            time: selectedTime,
             guests,
             phone,
           }),
         });
 
+        const result = await response.json().catch(() => ({}));
+
         if (!response.ok) {
-          throw new Error("送信に失敗しました");
+          const errorMessage = result.error || "送信に失敗しました";
+          showMessage(errorMessage, true);
+
+          if (response.status === 409) {
+            hideBookingForm();
+            await loadTimeSlots(selectedDate);
+          }
+
+          return;
         }
 
-        const [, month, day] = dateValue.split("-").map(Number);
-        const timeText = formatTime(timeValue);
+        const [, month, day] = selectedDate.split("-").map(Number);
+        const timeText = formatTime(selectedTime);
 
         showMessage(`${name}様${guests}名、${month}月${day}日${timeText}の予約を受け付けました`);
-
-        const reservations = await fetchReservations();
-        renderReservationList(reservations);
+        hideBookingForm();
+        form.reset();
+        await loadTimeSlots(selectedDate);
       } catch {
         showMessage("予約の送信に失敗しました。サーバーが起動しているか確認してください。", true);
       } finally {
@@ -380,30 +649,8 @@
       }
     });
 
-    async function deleteReservation(id) {
-      const response = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-
-      if (!response.ok) {
-        throw new Error("削除に失敗しました");
-      }
-    }
-
-    reservationList.addEventListener("click", async (event) => {
-      const deleteBtn = event.target.closest(".delete-btn");
-      if (!deleteBtn) return;
-
-      const id = deleteBtn.dataset.id;
-
-      try {
-        await deleteReservation(id);
-        const reservations = await fetchReservations();
-        renderReservationList(reservations);
-      } catch {
-        showMessage("予約の削除に失敗しました。", true);
-      }
-    });
-
-    loadReservationList();
+    renderWeekdays();
+    renderCalendar();
   </script>
 </body>
 </html>

@@ -19,16 +19,71 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+function normalizeTime(time) {
+  const [hour = "0", minute = "0"] = String(time).split(":");
+  return `${hour.padStart(2, "0")}:${minute.padStart(2, "0")}`;
+}
+
+function isValidDate(date) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(date);
+}
+
 function toClientReservation(row) {
   return {
     id: String(row.id),
     name: row.name,
     date: row.date,
-    time: row.time,
+    time: normalizeTime(row.time),
     guests: row.guests,
     phone: row.phone,
     createdAt: new Date(row.created_at).getTime(),
   };
+}
+
+function getSlotStatus(booked, capacity) {
+  const remaining = capacity - booked;
+
+  if (remaining <= 0) {
+    return "full";
+  }
+
+  if (remaining === 1 || remaining / capacity <= 0.25) {
+    return "few";
+  }
+
+  return "available";
+}
+
+async function countReservations(date, time) {
+  const normalizedTime = normalizeTime(time);
+
+  const { count, error } = await supabase
+    .from("reservations")
+    .select("*", { count: "exact", head: true })
+    .eq("date", date)
+    .in("time", [normalizedTime, `${normalizedTime}:00`]);
+
+  if (error) {
+    throw error;
+  }
+
+  return count ?? 0;
+}
+
+async function getTimeSlotByTime(time) {
+  const normalizedTime = normalizeTime(time);
+
+  const { data, error } = await supabase
+    .from("time_slots")
+    .select("id, time, capacity")
+    .eq("time", normalizedTime)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
 }
 
 app.use((req, res, next) => {
@@ -45,6 +100,49 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
+
+app.get("/api/timeslots", async (req, res) => {
+  const { date } = req.query;
+
+  if (!date || !isValidDate(date)) {
+    return res.status(400).json({ error: "date パラメータ（YYYY-MM-DD）が必要です" });
+  }
+
+  const { data: slots, error: slotsError } = await supabase
+    .from("time_slots")
+    .select("id, time, capacity")
+    .order("time", { ascending: true });
+
+  if (slotsError) {
+    console.error("[GET /api/timeslots] Supabase error:", slotsError);
+    return res.status(500).json({ error: "時間帯の取得に失敗しました" });
+  }
+
+  try {
+    const availability = await Promise.all(
+      (slots ?? []).map(async (slot) => {
+        const time = normalizeTime(slot.time);
+        const booked = await countReservations(date, time);
+        const capacity = Number(slot.capacity);
+        const remaining = Math.max(capacity - booked, 0);
+
+        return {
+          id: slot.id,
+          time,
+          capacity,
+          booked,
+          remaining,
+          status: getSlotStatus(booked, capacity),
+        };
+      })
+    );
+
+    res.json(availability);
+  } catch (error) {
+    console.error("[GET /api/timeslots] Supabase error:", error);
+    res.status(500).json({ error: "空き状況の取得に失敗しました" });
+  }
+});
 
 app.get("/api/reservations", async (req, res) => {
   const { data, error } = await supabase
@@ -67,10 +165,40 @@ app.post("/api/reservations", async (req, res) => {
     return res.status(400).json({ error: "必須項目が不足しています" });
   }
 
+  if (!isValidDate(String(date))) {
+    return res.status(400).json({ error: "予約日の形式が正しくありません" });
+  }
+
+  const normalizedTime = normalizeTime(time);
+
+  let slot;
+
+  try {
+    slot = await getTimeSlotByTime(normalizedTime);
+  } catch (error) {
+    console.error("[POST /api/reservations] Supabase error:", error);
+    return res.status(500).json({ error: "時間帯の確認に失敗しました" });
+  }
+
+  if (!slot) {
+    return res.status(400).json({ error: "指定された時間帯は存在しません" });
+  }
+
+  try {
+    const booked = await countReservations(String(date), normalizedTime);
+
+    if (booked >= Number(slot.capacity)) {
+      return res.status(409).json({ error: "この時間帯は満席です" });
+    }
+  } catch (error) {
+    console.error("[POST /api/reservations] Supabase error:", error);
+    return res.status(500).json({ error: "空き状況の確認に失敗しました" });
+  }
+
   const insertPayload = {
     name: String(name).trim(),
     date: String(date),
-    time: String(time),
+    time: normalizedTime,
     guests: Number(guests),
     phone: String(phone).trim(),
   };

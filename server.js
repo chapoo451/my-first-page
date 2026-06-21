@@ -18,7 +18,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+if (!supabaseServiceKey) {
+  console.error("SUPABASE_SERVICE_ROLE_KEY を環境変数に設定してください");
+  process.exit(1);
+}
+
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 function normalizeTime(time) {
   const [hour = "0", minute = "0"] = String(time).split(":");
   return `${hour.padStart(2, "0")}:${minute.padStart(2, "0")}`;
@@ -224,7 +231,7 @@ app.post("/api/reservations", async (req, res) => {
 });
 
 app.delete("/api/reservations/:id", async (req, res) => {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("reservations")
     .delete()
     .eq("id", req.params.id)

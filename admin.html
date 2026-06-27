@@ -195,6 +195,24 @@
     </section>
 
     <section class="admin-panel" id="adminPanel">
+    <!-- 時間帯設定セクション -->
+    <section style="margin-bottom:2rem;padding:1.5rem;border:1px solid #e2e8f0;border-radius:8px">
+      <h2 style="margin-top:0;font-size:1.25rem">時間帯設定</h2>
+      <div id="timeslot-list" style="margin-bottom:1rem">読み込み中...</div>
+      <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;padding-top:1rem;border-top:1px solid #eee">
+        <span style="font-weight:bold">追加：</span>
+        <input type="time" id="new-slot-time"
+          style="padding:0.4rem;border:1px solid #ccc;border-radius:4px">
+        <span>上限</span>
+        <input type="number" id="new-slot-capacity" min="1" max="99" placeholder="件数"
+          style="width:70px;padding:0.4rem;border:1px solid #ccc;border-radius:4px">
+        <span>件</span>
+        <button onclick="addTimeslot()"
+          style="padding:0.4rem 1rem;background:#3182ce;color:white;border:none;border-radius:4px;cursor:pointer">
+          追加
+        </button>
+      </div>
+    </section>  
       <h1>予約管理</h1>
       <p class="count" id="reservationCount"></p>
       <div class="table-wrap">
@@ -306,6 +324,77 @@
       `).join("");
     }
 
+// 時間帯管理
+const TIMESLOT_URL = "/api/timeslots/all";
+
+async function fetchTimeslots() {
+  const res = await fetch(TIMESLOT_URL);
+  if (!res.ok) throw new Error("時間帯の取得に失敗しました");
+  return res.json();
+}
+
+async function loadTimeslots() {
+  try {
+    const slots = await fetchTimeslots();
+    renderTimeslots(slots);
+  } catch {
+    document.getElementById("timeslot-list").innerHTML = "<p>読み込めませんでした</p>";
+  }
+}
+
+function renderTimeslots(slots) {
+  const list = document.getElementById("timeslot-list");
+  if (slots.length === 0) {
+    list.innerHTML = "<p>時間帯が登録されていません</p>";
+    return;
+  }
+  list.innerHTML = slots.map(slot => `
+    <div style="display:flex;align-items:center;gap:1rem;padding:0.5rem 0;border-bottom:1px solid #eee">
+      <span style="min-width:60px">${slot.time}</span>
+      <span>上限：</span>
+      <input type="number" min="1" max="99" value="${slot.capacity}"
+        style="width:60px;padding:0.25rem;border:1px solid #ccc;border-radius:4px"
+        onchange="updateCapacity(${slot.id}, this.value)">
+      <span>件</span>
+      <button onclick="deleteTimeslot(${slot.id})"
+        style="padding:0.25rem 0.75rem;background:#e53e3e;color:white;border:none;border-radius:4px;cursor:pointer">
+        削除
+      </button>
+    </div>
+  `).join("");
+}
+
+async function updateCapacity(id, capacity) {
+  const res = await fetch(`/api/timeslots/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ capacity: Number(capacity) })
+  });
+  if (!res.ok) alert("上限の変更に失敗しました");
+}
+
+async function deleteTimeslot(id) {
+  if (!confirm("この時間帯を削除しますか？")) return;
+  const res = await fetch(`/api/timeslots/${id}`, { method: "DELETE" });
+  if (!res.ok) { alert("削除に失敗しました"); return; }
+  await loadTimeslots();
+}
+
+async function addTimeslot() {
+  const time = document.getElementById("new-slot-time").value;
+  const capacity = document.getElementById("new-slot-capacity").value;
+  if (!time || !capacity) { alert("時間と上限件数を入力してください"); return; }
+  const res = await fetch("/api/timeslots", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ time, capacity: Number(capacity) })
+  });
+  if (!res.ok) { alert("追加に失敗しました"); return; }
+  document.getElementById("new-slot-time").value = "";
+  document.getElementById("new-slot-capacity").value = "";
+  await loadTimeslots();
+}
+
     async function fetchReservations() {
       const response = await fetch(API_URL);
 
@@ -352,6 +441,7 @@
       loginScreen.classList.add("is-hidden");
       adminPanel.classList.add("is-visible");
       loadReservations();
+      loadTimeslots();
     });
 
     reservationTableBody.addEventListener("click", async (event) => {

@@ -249,6 +249,51 @@ app.delete("/api/reservations/:id", async (req, res) => {
   res.sendStatus(204);
 });
 
+// 時間帯一覧取得
+app.get("/api/timeslots/all", async (req, res) => {
+  const { data, error } = await supabase
+    .from("time_slots")
+    .select("id, time, capacity")
+    .order("time", { ascending: true });
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
+
+// 時間帯追加
+app.post("/api/timeslots", async (req, res) => {
+  const { time, capacity } = req.body;
+  if (!time || !capacity) return res.status(400).json({ error: "time と capacity が必要です" });
+  const { data, error } = await supabaseAdmin
+    .from("time_slots")
+    .insert({ time, capacity: Number(capacity) })
+    .select();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data[0]);
+});
+
+// 時間帯削除
+app.delete("/api/timeslots/:id", async (req, res) => {
+  const { error } = await supabaseAdmin
+    .from("time_slots")
+    .delete()
+    .eq("id", req.params.id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true });
+});
+
+// 時間帯の上限変更
+app.patch("/api/timeslots/:id", async (req, res) => {
+  const { capacity } = req.body;
+  if (!capacity) return res.status(400).json({ error: "capacity が必要です" });
+  const { data, error } = await supabaseAdmin
+    .from("time_slots")
+    .update({ capacity: Number(capacity) })
+    .eq("id", req.params.id)
+    .select();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data[0]);
+});
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
   console.log(`Reservation form: http://localhost:${PORT}/reservation.html`);

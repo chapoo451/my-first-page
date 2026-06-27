@@ -54,7 +54,13 @@ function getSlotStatus(booked, capacity) {
     return "full";
   }
 
-  if (remaining === 1 || remaining / capacity <= 0.25) {
+  // 上限が1件の場合は「空き」か「満席」のみ
+  if (capacity === 1) {
+    return "available";
+  }
+
+  // 残り1件以下 かつ 上限2件以上の場合のみ「残りわずか」
+  if (remaining === 1) {
     return "few";
   }
 

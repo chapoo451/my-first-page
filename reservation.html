@@ -405,7 +405,7 @@
     function formatTime(timeValue) {
       const [hour, minute] = timeValue.split(":").map(Number);
       if (minute === 0) {
-        return `${hour}時`;
+        return `${hour}時00分`;
       }
       return `${hour}時${minute}分`;
     }

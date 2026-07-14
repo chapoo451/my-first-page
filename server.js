@@ -99,6 +99,10 @@ async function getTimeSlotByTime(time) {
   return data;
 }
 
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
